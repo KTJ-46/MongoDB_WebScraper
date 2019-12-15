@@ -1,29 +1,39 @@
-// Require dependencies
-var express = require("express");
-var bodyParser = require("body-parser");
-var cheerio = require("cheerio");
-var mongoose = require("mongoose");
-var exphbs = require("express-handlebars");
-var request = require("request");
+var express    = require('express'),
+    bodyParser = require('body-parser'),
+    exphbs     = require('express-handlebars'),
+    logger     = require("morgan");
 
-// set the port
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 8000;
 
-//set up express
+// Initialize Express
 var app = express();
 
-//set express router
-var router = express.Router();
+// Use morgan logger for logging requests
+app.use(logger("dev"));
+// Parse request body as JSON
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+// Make public a static folder
+app.use(express.static("public"));
 
-// set public fodler to static directory
-app.use(express.static(__dirname = "/public"));
+// Handlebars
+app.set('views', './views')
+app.engine(
+  "handlebars",
+  exphbs({
+    defaultLayout: "main"
+  })
+);
+app.set("view engine", "handlebars");
 
-//use router
-app.use(router);
+// Routes
+require('./routes/apiRoutes')(app)
 
-//Listen on Port
+// Start the server
 app.listen(PORT, function() {
-    console.log ("Listening on port: " + PORT);
-
-});
-
+    console.log(
+      "==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.",
+      PORT,
+      PORT
+    );
+  });
